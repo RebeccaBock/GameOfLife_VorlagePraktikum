@@ -70,6 +70,7 @@ public class Application {
             // window repaint to update the graphics
             pool.submit(() -> {
                 playground.asList().forEach(cell -> cell.nextGen());
+                window.validate();
                 window.repaint();
             });
             
