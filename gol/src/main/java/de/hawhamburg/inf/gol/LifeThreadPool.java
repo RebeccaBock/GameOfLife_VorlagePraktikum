@@ -25,15 +25,6 @@ public class LifeThreadPool {
     }
     
     /**
-     * This method will block until the queue of tasks has been emptied by the
-     * running threads.
-     * @throws InterruptedException 
-     */
-    public void barrier() throws InterruptedException {
-        // TODO
-    }
-    
-    /**
      * Calls interrupt() on every thread in this pool.
      */
     public void interrupt() {

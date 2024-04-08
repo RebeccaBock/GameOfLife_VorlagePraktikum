@@ -11,24 +11,14 @@ import java.util.logging.Logger;
 public class LifeThread extends Thread {
     
     private final LifeThreadPool pool;
-    private boolean isInterrupted = false;
     
     public LifeThread(LifeThreadPool pool) {
         this.pool = pool;
     }
     
-    /**
-     * Sets the interrupted flag, so that this thread stops after finishing
-     * the current task.
-     */
-    @Override
-    public void interrupt() {
-        isInterrupted = true;
-    }
-    
     @Override
     public void run() {
-        while (!isInterrupted) {
+        while (!interrupted()) {
             // TODO
         }
     }

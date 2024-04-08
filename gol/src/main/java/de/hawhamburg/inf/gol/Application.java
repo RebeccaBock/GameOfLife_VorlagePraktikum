@@ -64,7 +64,7 @@ public class Application {
             }
 
             // Wait for all threads to finish this generation
-            // TODO
+            // TODO Use a CountDownLatch
             
             // Submit switch to next generation for each cell and force a
             // window repaint to update the graphics
