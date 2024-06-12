@@ -29,6 +29,7 @@ public class LifeThreadPool {
      */
     public void interrupt() {
         // TODO Nutzen Sie Streams!
+        Stream.of(threads).forEach(Thread::interrupt);
     }
     
     /**
@@ -39,14 +40,22 @@ public class LifeThreadPool {
      */
     public void joinAndExit() throws InterruptedException {
         // TODO
+        for(int i = 0; i < numThreads; i++){
+            threads[i].interrupt();
+            threads[i].join();
+        }
+        
+    }
     
     /**
      * Adds a task to the queue of this pool.
      * 
      * @param task Runnable containing the work to be done 
      */
-    public void submit(Runnable task) {
+    public synchronized void submit(Runnable task) {
         // TODO
+        tasks.add(task);
+        notifyAll();
     }
     
     /**
@@ -56,8 +65,12 @@ public class LifeThreadPool {
      * @return Next task from the pool queue
      * @throws InterruptedException 
      */
-    public Runnable nextTask() throws InterruptedException {
+    public synchronized Runnable nextTask() throws InterruptedException {
         // TODO
+        while(tasks.isEmpty()){
+            wait();    
+        }
+        return tasks.poll();
     }
     
     /**
@@ -65,7 +78,8 @@ public class LifeThreadPool {
      */
     public void start() {
         for (int i = 0; i < numThreads; i++) {
-            threads[i] = ..
+            threads[i] = new LifeThread(this);
+            threads[i].start();
             // TODO
         }
     }

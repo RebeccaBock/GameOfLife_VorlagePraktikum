@@ -1,6 +1,7 @@
 package de.hawhamburg.inf.gol;
 
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -35,10 +36,13 @@ public class Application {
      */
     private static Stream<Cell> createCellStream(float p) {
         // TODO
+        Random random = new Random();
         
-        return null; // FIXME
+        return Stream.generate(()-> random.nextFloat() > p ? 
+                new Cell(0) : new Cell (1)); // FIXME
     }
     
+    @SuppressWarnings({"empty-statement", "SleepWhileInLoop"})
     public static void main(String[] args) {
         Stream<Cell> cellStream = createCellStream(ALIVE_PROBABILITY);
         Playground playground = new Playground(DIM_X, DIM_Y, cellStream);
@@ -54,17 +58,27 @@ public class Application {
         
         while (true) {
             Life life = new Life(playground);
+            CountDownLatch cdl = new CountDownLatch(DIM_X*DIM_Y);
             for (int xi = 0; xi < DIM_X; xi++) {
-                for (int yi = 0; yi < DIM_Y; yi++) {
+                for (int yi = 0; yi < DIM_Y; yi++) {                 
                                        
                     // Submit new life.process() call as runable to the pool
                     // TODO
-                    
+                    final int xx = xi;
+                    final int yy = yi;
+                    pool.submit(() -> {life.process(playground.getCell(xx, yy), xx, yy);
+                    cdl.countDown();});
                 }
             }
 
             // Wait for all threads to finish this generation
             // TODO Use a CountDownLatch
+            
+            try{
+                cdl.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(LifeThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
             // Submit switch to next generation for each cell and force a
             // window repaint to update the graphics
@@ -74,8 +88,15 @@ public class Application {
                 window.repaint();
             });
             
-            // Wait SLEEP milliseconds until the next generation
-           // TODO
+            try {
+                // Wait SLEEP milliseconds until the next generation
+                // TODO
+                Thread.sleep(SLEEP);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
+           
         }
 
     }
